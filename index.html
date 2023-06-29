@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test de géolocalisation</title>
+</head>
+<body>
+    <button id="recuperer">Récupérer</button>
+    <p id="result"></p>
+
+    <script>
+       // Fonction pour récupérer les coordonnées GPS
+function getCoordinates() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(showPosition);
+  } else {
+    console.log("La géolocalisation n'est pas prise en charge par ce navigateur.");
+  }
+}
+
+// Fonction de rappel pour afficher les coordonnées
+function showPosition(position) {
+  var latitude = position.coords.latitude;
+  var longitude = position.coords.longitude;
+
+  // Appeler une API de géocodage inverse pour obtenir le nom du lieu
+  var geocodingApiUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`;
+  
+  // Faire une requête AJAX pour obtenir les données de géocodage inverse
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', geocodingApiUrl, true);
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4 && xhr.status === 200) {
+      var response = JSON.parse(xhr.responseText);
+      var locationName = response.display_name;
+
+      // Mettre à jour l'élément HTML avec le nom du lieu
+      var resultElement = document.getElementById("result");
+      resultElement.textContent = "Lieu : " + locationName;
+    }
+  };
+  xhr.send();
+}
+
+// Fonction pour attacher le clic du bouton à la récupération des coordonnées GPS
+function attachButtonClickEvent() {
+  var button = document.getElementById("recuperer");
+  button.addEventListener("click", getCoordinates);
+}
+
+// Appeler la fonction pour attacher l'événement de clic du bouton
+attachButtonClickEvent();
+
+    </script>
+</body>
+</html>
